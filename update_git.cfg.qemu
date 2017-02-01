@@ -1,0 +1,7 @@
+PACKAGES=(qemu qemu-linux-user)
+GIT_TREE=git://github.com/openSUSE/qemu.git
+GIT_LOCAL_TREE=~/git/qemu-opensuse
+GIT_BRANCH=opensuse-2.8
+GIT_UPSTREAM_TAG=v2.8.0
+
+# vim:syntax=sh

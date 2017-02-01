@@ -1,0 +1,7 @@
+PACKAGES=rpmlint
+GIT_TREE=https://github.com/lnussel/rpmlint-code.git
+GIT_LOCAL_TREE=~/git/rpmlint-code
+GIT_BRANCH=opensuse-1.8
+GIT_UPSTREAM_TAG=rpmlint-1.8
+
+# vim:syntax=sh

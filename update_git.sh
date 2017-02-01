@@ -1,23 +1,25 @@
 #!/bin/bash -e
+# Copyright (c) 2011-2017 SUSE LLC
 #
-# based on qemu's update_git.sh this program updates the patches
-# applied on top of a tarball based on commmits in git
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-# how to use:
-# quilt setup rpmlint.spec
-# cp rpmlint-$RPMLINTVERSION/series .
-# mkdir ~/git; cd ~/git
-# git clone git://git.code.sf.net/p/rpmlint/code rpmlint-code
-# git checkout -b opensuse-$RPMLINTVERSION v$RPMLINTVERSION
-# git quiltimport --patches /where/rpmlint/checkout/is
-# ... add/remove/rebase patches
-# ... to rebase to a new version create branch and modify versions below
-# when done run update_git.sh
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
-GIT_TREE=https://github.com/lnussel/rpmlint-code.git
-GIT_LOCAL_TREE=~/git/rpmlint-code
-GIT_BRANCH=opensuse-1.8
-GIT_UPSTREAM_TAG=rpmlint-1.8
+. update_git.cfg
 
 cleanup()
 {
@@ -110,7 +112,7 @@ for patch in *.diff; do
     fi
 done
 
-for package in rpmlint; do
+for package in "${PACKAGES[@]}"; do
     skip=
     while IFS= read -r line; do
 	if [ "$line" = "# PATCHLIST END" ]; then
