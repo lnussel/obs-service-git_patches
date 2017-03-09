@@ -76,7 +76,7 @@ for i in $CMP_DIR/*.tmp; do
     newname=${newname:0:40}.diff
     # remove git signature and commit hash to make content
     # independent of git version
-    head -n -3 "$i" | tail -n +2 > "$CMP_DIR/$newname"
+    head -n -3 "$i" | tail -n +2 | sed -e '/^index .......\.\........ [0-9]\+/d' > "$CMP_DIR/$newname"
     rm "$i"
     localname=${newname#*-}
     patches+=("$localname")
