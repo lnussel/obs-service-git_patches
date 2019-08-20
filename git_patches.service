@@ -1,0 +1,24 @@
+<service name="git_patches">
+<summary>create patch files from a git branch relative to upstream commit</summary>
+   <description></description>
+  <parameter name="url">
+    <description>Specify URL to checkout.</description>
+    <required/>
+  </parameter>
+  <parameter name="package">
+    <description>which spec file this relates to</description>
+  </parameter>
+  <parameter name="branch">
+    <description>branch to generate patches from</description>
+    <required/>
+  </parameter>
+  <parameter name="upstream_tag">
+    <description>tag relative to which create patches from</description>
+    <required/>
+  </parameter>
+  <parameter name="patchfile">
+    <description>generate a separate patch file to include from the .spec rather than modifying the spec file</description>
+    <allowedvalue>enable</allowedvalue>
+    <allowedvalue>disable</allowedvalue>
+  </parameter>
+</service>

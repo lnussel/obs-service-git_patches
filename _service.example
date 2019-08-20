@@ -1,0 +1,7 @@
+<services>
+  <service name="git_patches" mode="disabled">
+    <param name="url">https://github.com/hello/hello.git</param>
+    <param name="branch">4.2-opensuse</param>
+    <param name="upstream_tag">4.2</param>
+  </service>
+</services>

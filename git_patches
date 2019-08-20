@@ -1,0 +1,71 @@
+#!/usr/bin/python3
+# Copyright (c) 2019 SUSE LLC
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+from pprint import pprint
+import argparse
+import logging
+import os
+import subprocess
+import sys
+
+def main(args):
+
+    # do some work here
+    logger = logging.getLogger("update_git")
+
+    if args.package:
+        os.environ['PACKAGES'] = ' '.join(args.package)
+    os.environ['GIT_TREE'] = args.url
+    os.environ['GIT_BRANCH'] = args.branch
+    os.environ['GIT_UPSTREAM_TAG'] = args.upstream_tag
+    if args.patchfile and args.patchfile == 'enable':
+        os.environ['GIT_EXTERNAL_PATCHLIST'] = 'yes'
+
+    shellscript=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'update_git.sh')
+    subprocess.call([shellscript])
+
+    return 0
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='boilerplate python commmand line program')
+    parser.add_argument("--outdir", required=True, help="output directory")
+    parser.add_argument("--package", action='append', help="name of packages (ie spec files)")
+    parser.add_argument("--url", required=True, help="url of git repo")
+    parser.add_argument("--branch", required=True, help="branch name to generate patches from")
+    parser.add_argument("--upstream_tag", required=True, help="url of git repo")
+    parser.add_argument("--patchfile", choices=('enable', 'disable'), help="use external patchlist")
+    parser.add_argument("--debug", action="store_true", help="debug output")
+    parser.add_argument("--verbose", action="store_true", help="verbose")
+
+    args = parser.parse_args()
+
+    if args.debug:
+        level  = logging.DEBUG
+    elif args.verbose:
+        level = logging.INFO
+    else:
+        level = None
+
+    logging.basicConfig(level = level)
+
+    sys.exit(main(args))
+
+# vim: sw=4 et

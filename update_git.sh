@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright (c) 2011-2017 SUSE LLC
+# Copyright (c) 2011-2019 SUSE LLC
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,7 +19,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-. update_git.cfg
+shopt -s nullglob
+
+if [ -r update_git.cfg ]; then
+    . update_git.cfg
+fi
+
+if [ -z "$GIT_TREE" -o -z "$GIT_BRANCH" -o -z "$GIT_UPSTREAM_TAG" ]; then
+    echo "need to set all of GIT_TREE GIT_BRANCH GIT_UPSTREAM_TAG" >&2
+    exit 1
+fi
 
 cleanup()
 {
@@ -36,6 +45,10 @@ rm -f .update_git.*
 
 : ${GIT_LOCAL_TREE:=${XDG_CACHE_HOME:-~/.cache}/update_git/${GIT_TREE##*/}}
 
+if [ -z "$PACKAGES" ]; then
+    specs=(*.spec)
+    PACKAGES=("${specs[@]%.spec}")
+fi
 
 echo "Processing $GIT_BRANCH branch of remote git tree, using tag:" \
      "$GIT_UPSTREAM_TAG"
@@ -45,7 +58,7 @@ if ! [ -d "$GIT_LOCAL_TREE" ]; then
 
     git clone --bare $GIT_TREE $GIT_LOCAL_TREE
 fi
-echo "Updating cache ache $GIT_LOCAL_TREE"
+echo "Updating cache at $GIT_LOCAL_TREE"
 (cd $GIT_LOCAL_TREE && git remote update)
 
 echo "Processing $GIT_BRANCH branch of local git tree, using tag:" \
