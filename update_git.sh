@@ -106,25 +106,34 @@ for patch in *.diff; do
     fi
 done
 
+write_patches()
+{
+    local i=0
+    for patch in "${patches[@]}"; do
+	printf "Patch%02d:        %s\n" "$i" "$patch"
+	let i+=1
+    done
+}
+
 for package in "${PACKAGES[@]}"; do
-    skip=
-    while IFS= read -r line; do
-	if [ "$line" = "# PATCHLIST END" ]; then
-	    skip=
-	    i=0
-	    for patch in "${patches[@]}"; do
-		printf "Patch%02d:        %s\n" "$i" "$patch"
-		let i+=1
-	    done
-	fi
-	if [ -z "$skip" ]; then
-	    echo "$line"
-	fi
-	if [ "$line" = "# PATCHLIST BEGIN" ]; then
-	    skip=1
-	fi
-    done < $package.spec > $package.spec.new
-    mv $package.spec.new $package.spec
+    if [ "$GIT_EXTERNAL_PATCHLIST" = yes ]; then
+	write_patches > $package-git_patches.inc
+    else
+	skip=
+	while IFS= read -r line; do
+	    if [ "$line" = "# PATCHLIST END" ]; then
+		skip=
+		write_patches
+	    fi
+	    if [ -z "$skip" ]; then
+		echo "$line"
+	    fi
+	    if [ "$line" = "# PATCHLIST BEGIN" ]; then
+		skip=1
+	    fi
+	done < $package.spec > $package.spec.new
+	mv $package.spec.new $package.spec
+    fi
 
     if [ -e .update_git.changes.deleted ]; then
 	echo "* Patches dropped:" >> $package.changes.proposed
