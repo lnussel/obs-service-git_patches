@@ -34,30 +34,24 @@ CMP_DIR=`mktemp -d --tmpdir update_git.XXXXXXXXXX`
 
 rm -f .update_git.*
 
-if [ -d "$GIT_LOCAL_TREE" ]; then
-    echo "Processing $GIT_BRANCH branch of local git tree, using tag:" \
-         "$GIT_UPSTREAM_TAG"
-    if ! (cd $GIT_LOCAL_TREE && git show-branch $GIT_BRANCH &>/dev/null); then
-        echo "Error: Branch $GIT_BRANCH not found - please create a remote" \
-             "tracking branch of origin/$GIT_BRANCH"
-        exit
-    fi
-    git clone -ls $GIT_LOCAL_TREE $GIT_DIR -b $GIT_BRANCH
-    if ! (cd $GIT_LOCAL_TREE && git remote show upstream &>/dev/null); then
-        echo "Remote for upstream git tree not found. Next time add remote" \
-             "named upstream for $GIT_TREE and update"
-        (cd $GIT_DIR && git remote add upstream "$GIT_TREE")
-        (cd $GIT_DIR && git remote update)
-   fi
-else
-    echo "Processing $GIT_BRANCH branch of remote git tree, using tag:" \
-         "$GIT_UPSTREAM_TAG"
-    echo "(For much fast processing, consider establishing a local git tree" \
-         "at $GIT_LOCAL_TREE)"
-    git clone $GIT_TREE $GIT_DIR -b $GIT_BRANCH
-    (cd $GIT_DIR && git remote add upstream "$GIT_TREE")
-    (cd $GIT_DIR && git remote update)
+: ${GIT_LOCAL_TREE:=${XDG_CACHE_HOME:-~/.cache}/update_git/${GIT_TREE##*/}}
+
+
+echo "Processing $GIT_BRANCH branch of remote git tree, using tag:" \
+     "$GIT_UPSTREAM_TAG"
+
+if ! [ -d "$GIT_LOCAL_TREE" ]; then
+    echo "Initializing cache at $GIT_LOCAL_TREE"
+
+    git clone --bare $GIT_TREE $GIT_LOCAL_TREE
 fi
+echo "Updating cache ache $GIT_LOCAL_TREE"
+(cd $GIT_LOCAL_TREE && git remote update)
+
+echo "Processing $GIT_BRANCH branch of local git tree, using tag:" \
+     "$GIT_UPSTREAM_TAG"
+git clone -ls $GIT_LOCAL_TREE $GIT_DIR -b $GIT_BRANCH
+
 (cd $GIT_DIR && git format-patch -N $GIT_UPSTREAM_TAG --suffix=.tmp -o $CMP_DIR >/dev/null)
 
 CHANGED_COUNT=0
